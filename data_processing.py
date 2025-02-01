@@ -1,5 +1,6 @@
 import csv
 from tabulate import tabulate
+from itertools import product
 
 def convert_to_table(A,B, csv_filename):
     '''
@@ -33,7 +34,11 @@ def convert_to_table(A,B, csv_filename):
         row = [p] + [data_dict.get((p,k), '') for k in k_values]
         table.append(row)
 
-    print(tabulate(table, headers=header))
+    return tabulate(table, headers=header)
+
+def create_file(content_string, filename):
+    with open(filename, 'w') as f:
+        f.write(content_string)
 
 
 def load_data_keys(data_filename):
@@ -49,4 +54,9 @@ def load_data_keys(data_filename):
 
 
 if __name__ == '__main__':
-    convert_to_table(1,0,'data.csv')
+    # convert_to_table(1,0,'data_test.csv')
+
+    data_file = 'data_test.csv'
+    for (a,b) in product(range(-5,6), range(-5,6)):
+        if (a,b) != 0:
+            create_file(convert_to_table(a,b, data_file), f'tables/({a},{b})-table.txt')
