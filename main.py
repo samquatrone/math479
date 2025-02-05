@@ -38,7 +38,7 @@ def generate_data(a_range,b_range,p_range,k_range, data_filename):
                 continue
             
             try:
-                H = EllipticCurve(GF(p,k), [a,b])
+                H = EllipticCurve(GF(p**k), [a,b])
                 data = (a,b,p,k, H.abelian_group().short_name())
                 datawriter.writerow(data)
             except Exception as e:
