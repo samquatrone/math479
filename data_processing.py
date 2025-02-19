@@ -1,6 +1,10 @@
 import csv
 from tabulate import tabulate
 from itertools import product
+from re import findall
+import pandas as pd
+
+group_data = None
 
 def convert_to_table(A,B, csv_filename):
     '''
@@ -41,6 +45,10 @@ def create_file(content_string, filename):
         f.write(content_string)
 
 
+def parse_group_string(s):
+    return tuple(map(int, findall(r'\d+', s)))
+
+
 def load_data_keys(data_filename):
     data_keys = set()
 
@@ -52,11 +60,44 @@ def load_data_keys(data_filename):
     
     return data_keys
 
+def load_data(file_path):
+    global group_data
+    if group_data is None:
+        group_data = pd.read_csv(
+            file_path, 
+            delimiter=',',
+            names=['a','b','p','k','group_structure','group_order'],
+            # dtype={'a': int, 'b': int, 'p': int, 'group_order': int},
+            quotechar="'",
+            quoting=csv.QUOTE_MINIMAL
+        )
+
+    return group_data
+
+# def find_group(a,b,p,k, file_path='data.csv'):
+
+
+def generate_sequences():
+    ''
+    # Naive approach:
+    # Load all data into memory
+
+
+def create_tables(a_range, b_range):
+    '''
+    a_range and b_range should be integer iterators
+    '''
+    for (a,b) in product(a_range, b_range):
+        if (a,b) != 0:
+            create_file(convert_to_table(a,b, data_path), f'tables/({a},{b})-table.txt')
+
+
 
 if __name__ == '__main__':
     # convert_to_table(1,0,'data_test.csv')
 
-    data_file = 'data.csv'
-    for (a,b) in product(range(-5,6), range(-5,6)):
-        if (a,b) != 0:
-            create_file(convert_to_table(a,b, data_file), f'tables/({a},{b})-table.txt')
+    data_path = 'data.csv'
+    data = load_data(data_path)
+    print(data['group_structure'])
+
+
