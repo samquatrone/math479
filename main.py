@@ -40,17 +40,25 @@ def generate_range(a_range,b_range,p_range,k_range, data_filename):
             if (a,b) == (0,0) or (a,b,p,k) in existing_data_keys or is_singular(a,b,p,k):
                 continue
             
-            try:    
-                H = EllipticCurve(GF(p**k), [a,b])
-                # FIXME: abelian_group() method not intended for large fields (must be factorable)
-                group_string = H.abelian_group().short_name()
+            H = compute_group(a,b,p,k)
+            if H is not None:
+                group_structure_tuple = parse_group_string(H.abelian_group().short_name())
+                group_structure_1 = group_structure_tuple[0]
+                group_structure_2 = group_structure_tuple[1] if len(group_structure_tuple) == 2 else 1
                 group_order = H.order()
-                data = (a,b,p,k, parse_group_string(group_string), group_order)
-                datawriter.writerow(data)
-            except Exception as e:
-                pass
-                # print(f'{(a,b,p,k)}:    {e}')
+                
+            data = (a,b,p,k, group_order, group_structure_1, group_structure_2)
+            datawriter.writerow(data)
 
+
+
+def compute_group(a,b,p,k):
+    try:
+        # FIXME: abelian_group() method not intended for large fields (must be reasonably factorable)
+        return EllipticCurve(GF(p**k), [a,b])
+
+    except Exception as e:
+        return None
 
 def parse_group_string(s):
     '''
@@ -64,24 +72,6 @@ def is_singular(a,b,p,k):
     return (4*a**3 + 27*b**2) % q == 0
 
 
-def get_groups(it, data_path='data.csv', generate=False):
-    '''
-    Note: `it` should iterate all wanted (a,b,p,k) values.
-    '''
-    data = data_processing.load_data(data_path)
-    for a,b,p,k in it:
-        
-        row = data[
-            (data['a'] == a) &
-            (data['b'] == b) &
-            (data['p'] == p) &
-            (data['k'] == k)
-        ]
-        print(data[row])
-        # print(data.dtypes)
-    # print(data == data_processing.group_data)
-
-
 
 
 
@@ -91,46 +81,8 @@ if __name__ == '__main__':
     p_range = (1,50)
     k_range = (1,10)
 
-    # generate_data(a_range, b_range, p_range, k_range, 'data.csv')
-    # get_groups([(1,0,3,1)])
-    # data_processing.group_data.dtypes
-
-    df = data_processing.load_data('data.csv')
-
-    # Find all p's with isomorphic group structures.
-    # Generate a sequence for each of these
-    
-    # primes = primes_first_n(10)[1:]
-
-    sequences = set()
-    # indices = list(product(primes_first_n(10)[1:], range(1,10)))
-
-    initial_groups = {}
-    p_sequences = {}
-
-    # TODO: Either design a test which doesn't require observation and will just check if our condition is 
-    #       ever violated, or design a test which will group all of the data/construct the sequences I want 
-    #       to see in a way that the same sequences should be next to each other. Highlight discrepancies.
-
-    # initial_groups[3] = list(set(df.loc[(df['p'] == 3) & (df['k'] == 1)]['group_structure'].values))
-    # print(initial_groups[3])
-    for d in df.groupby(['p']):
-        print(d)
-
-    for p in primes_first_n(10)[1:]:
-        ''
-        # Find all group structures where 'p'=p 'k'=1 (and a,b are anything)
-        p_data = df.loc[(df['p'] == p) & (df['k'] == 1)]
-        # print(p_data)
-
-        # print(p_data)
-
-        # initial_groups[p] = list(set(df.loc[(df['p'] == p) & (df['k'] == 1)]['group_structure'].values))
-        for k in range(1,11):
-            # 
-            ''
-
-
+    generate_range(a_range, b_range, p_range, k_range, 'data.csv')
+ 
 
     
         
