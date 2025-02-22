@@ -43,7 +43,7 @@ def generate_range(a_range,b_range,p_range,k_range, data_filename):
             H = compute_group(a,b,p,k)
             if H is not None:
                 group_structure_tuple = parse_group_string(H.abelian_group().short_name())
-                group_structure_1 = group_structure_tuple[0]
+                group_structure_1 = group_structure_tuple[0] if len(group_structure_tuple) > 0 else 1
                 group_structure_2 = group_structure_tuple[1] if len(group_structure_tuple) == 2 else 1
                 group_order = H.order()
                 
