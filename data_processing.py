@@ -4,12 +4,11 @@ from itertools import product
 from re import findall
 import pandas as pd
 
+
 '''
 Note: pandas stores integers as their own int64 type, but since there are some 
 large integers in the database (e.g. 'group_struc_1' contains very large integers),
 these columns need to be converted to int before being read.
-
-
 '''
 
 group_data = None

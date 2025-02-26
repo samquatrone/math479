@@ -49,8 +49,10 @@ def generate_range(a_range,b_range,p_range,k_range, data_filename):
                 group_structure_2 = group_structure_tuple[1] if len(group_structure_tuple) == 2 else 1
                 group_order = H.order()
                 
-            data = (a,b,p,k, group_order, group_structure_1, group_structure_2)
-            datawriter.writerow(data)
+                data = (a,b,p,k, group_order, group_structure_1, group_structure_2)
+                datawriter.writerow(data)
+
+
 
 
 
@@ -79,8 +81,8 @@ def is_singular(a,b,p,k):
 if __name__ == '__main__':
     a_range = (-5,5)
     b_range = (-5,5)
-    p_range = (1,50)
-    k_range = (1,15)
+    p_range = (1,200)
+    k_range = (1,3)
 
     generate_range(a_range, b_range, p_range, k_range, 'data.csv')
  
