@@ -31,7 +31,7 @@ def generate_range(a_range,b_range,p_range,k_range, data_filename):
             product(
                 range(a_1, a_2+1),
                 range(b_1, b_2+1),
-                islice(Primes(), p_1, p_2+1),   # FIXME: Use something with less overhead
+                islice(Primes(), p_1, p_2+1),
                 range(k_1, k_2+1)
             ), 
             total=(a_2-a_1+1)*(b_2-b_1+1)*(p_2-p_1+1)*(k_2-k_1+1)  # number of iterations
@@ -40,8 +40,10 @@ def generate_range(a_range,b_range,p_range,k_range, data_filename):
             if (a,b) == (0,0) or (a,b,p,k) in existing_data_keys or is_singular(a,b,p,k):
                 continue
             
+            
             H = compute_group(a,b,p,k)
             if H is not None:
+                # FIXME: abelian_group() method not intended for large fields (must be reasonably factorable)
                 group_structure_tuple = parse_group_string(H.abelian_group().short_name())
                 group_structure_1 = group_structure_tuple[0] if len(group_structure_tuple) > 0 else 1
                 group_structure_2 = group_structure_tuple[1] if len(group_structure_tuple) == 2 else 1
@@ -54,7 +56,6 @@ def generate_range(a_range,b_range,p_range,k_range, data_filename):
 
 def compute_group(a,b,p,k):
     try:
-        # FIXME: abelian_group() method not intended for large fields (must be reasonably factorable)
         return EllipticCurve(GF(p**k), [a,b])
 
     except Exception as e:
@@ -79,7 +80,7 @@ if __name__ == '__main__':
     a_range = (-5,5)
     b_range = (-5,5)
     p_range = (1,50)
-    k_range = (1,10)
+    k_range = (1,15)
 
     generate_range(a_range, b_range, p_range, k_range, 'data.csv')
  
