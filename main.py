@@ -79,10 +79,10 @@ def is_singular(a,b,p,k):
 
 
 if __name__ == '__main__':
-    a_range = (-5,5)
-    b_range = (-5,5)
-    p_range = (1,200)
-    k_range = (1,3)
+    a_range = (-10,10)
+    b_range = (-10,10)
+    p_range = (1,100)
+    k_range = (1,8)
 
     generate_range(a_range, b_range, p_range, k_range, 'data.csv')
  
