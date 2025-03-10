@@ -27,14 +27,14 @@ Option 2:
 
 df = data_processing.load_data()
 df['a_mod_p'] = df.apply(lambda row: row['a'] % row['p'], axis=1)
-# df['b_mod_p'] = df.apply(lambda row: row['a'] % row['b'], axis=1)
+df['b_mod_p'] = df.apply(lambda row: row['b'] % row['p'], axis=1)
 
 counterexamples = []
 
-for (a_mod_p, b, p, k), mod_a_block in df.groupby(['a_mod_p','b','p','k']):
-    groups = set(mod_a_block.apply(lambda row: (row['group_struc_1'], row['group_struc_2']), axis=1))
+for (a_mod_p, b_mod_p, p, k), mod_ab_block in df.groupby(['a_mod_p','b_mod_p','p','k']):
+    groups = set(mod_ab_block.apply(lambda row: (row['group_struc_1'], row['group_struc_2']), axis=1))
     if len(groups) != 1:
         counterexamples.append(groups)
         print(groups)
 
-
+print(counterexamples)
