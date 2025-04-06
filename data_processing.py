@@ -59,7 +59,7 @@ def load_data_keys(data_filename):
 
 def get_group_structure(a,b,p,k, file_path='data.csv'):
     df = load_data(file_path)
-    group_structure = df.loc[
+    group_structure = df.loc[ 
         (df['a'] == a) &
         (df['b'] == b) &
         (df['p'] == p) &
