@@ -75,9 +75,9 @@ def load_data(file_path='data.csv'):
             file_path, 
             delimiter=',',
             names=['a','b','p','k','group_order','group_struc_1','group_struc_2'],
-            # dtype={'group_struc_1': int},
+            dtype={'group_struc_1': str, 'group_struc_2': str},
             quotechar="'",
-            quoting=csv.QUOTE_MINIMAL
+            quoting=csv.QUOTE_MINIMAL,
         )
 
         group_data['p'] = group_data['p'].apply(int)
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     data_file_path = 'data.csv'
     group_data = load_data()
 
-    write_tables('html')
+    write_tables('txt')
     # print(convert_to_table(0,1))
     # print(get_group_structure(0,1,3,4))
 
