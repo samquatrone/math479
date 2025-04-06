@@ -14,8 +14,8 @@ class CSVWriter:
     Handles the opening and creation of csv files.
     
     '''
-    def __init__(self):
-        self.max_bytes = 90*1024
+    def __init__(self, max_bytes=90*1024*1024): # 90 MB
+        self.max_bytes = max_bytes
         self.generic_file_string = 'data_'
         self.data_path = os.path.join(os.getcwd(), 'data')
         self.file_num = len(os.listdir(self.data_path))
@@ -64,7 +64,7 @@ class CSVWriter:
     
 
 
-def generate_range(a_range,b_range,p_range,k_range, data_filename):
+def generate_range(a_range,b_range,p_range,k_range):
     '''
     Generates data with ranges for each parameter given as a tuple such as a_range = (a_initial, a_final).
 
@@ -77,36 +77,38 @@ def generate_range(a_range,b_range,p_range,k_range, data_filename):
     k_1, k_2 = k_range
 
     # Load keys of existing data to avoid redundant computations
-    existing_data_keys = data_processing.load_data_keys(data_filename)
+    df = data_processing.load_data()
+    # existing_data_keys = data_processing.load_data_keys(data_filename)
 
-    with open(data_filename, 'a', newline='') as csvfile:  # FIXME: handle case where file doesn't exist
-        datawriter = csv.writer(csvfile, delimiter=',', quotechar="'", quoting=csv.QUOTE_MINIMAL)
+    datawriter = CSVWriter()
 
-        for a,b,p,k in tqdm(    # wrapper for progress bar
-            product(
-                range(a_1, a_2+1),
-                range(b_1, b_2+1),
-                islice(Primes(), p_1, p_2+1),
-                range(k_1, k_2+1)
-            ), 
-            total=(a_2-a_1+1)*(b_2-b_1+1)*(p_2-p_1+1)*(k_2-k_1+1)  # number of iterations
-        ):
-            # print((a,b,p,k), is_singular(a,b,p,k))
-            if (a,b) == (0,0) or (a,b,p,k) in existing_data_keys or is_singular(a,b,p,k):
-                continue
+    # with open(data_filename, 'a', newline='') as csvfile:  # FIXME: handle case where file doesn't exist
+        # datawriter = csv.writer(csvfile, delimiter=',', quotechar="'", quoting=csv.QUOTE_MINIMAL)
+
+    for a,b,p,k in tqdm(    # wrapper for progress bar
+        product(
+            range(a_1, a_2+1),
+            range(b_1, b_2+1),
+            islice(Primes(), p_1, p_2+1),
+            range(k_1, k_2+1)
+        ), 
+        total=(a_2-a_1+1)*(b_2-b_1+1)*(p_2-p_1+1)*(k_2-k_1+1)  # number of iterations
+    ):
+        if (a,b,p,k) in df.index:
+            continue
+        # elif (a % p, b % p, p, k) in df.index:
+        #     # TODO: write df.loc[(a%p,b%p,p,k)] again for new index
+        
+        H = compute_group(a,b,p,k)
+        if H is not None:
+            # FIXME: abelian_group() method not intended for large fields (must be reasonably factorable)
+            group_structure_tuple = parse_group_string(H.abelian_group().short_name())
+            group_structure_1 = group_structure_tuple[0] if len(group_structure_tuple) > 0 else 1
+            group_structure_2 = group_structure_tuple[1] if len(group_structure_tuple) == 2 else 1
+            group_order = H.order()
             
-            
-            H = compute_group(a,b,p,k)
-            if H is not None:
-                # FIXME: abelian_group() method not intended for large fields (must be reasonably factorable)
-                group_structure_tuple = parse_group_string(H.abelian_group().short_name())
-                group_structure_1 = group_structure_tuple[0] if len(group_structure_tuple) > 0 else 1
-                group_structure_2 = group_structure_tuple[1] if len(group_structure_tuple) == 2 else 1
-                group_order = H.order()
-                
-                data = (a,b,p,k, group_order, group_structure_1, group_structure_2)
-                datawriter.writerow(data)
-
+            data = (a,b,p,k, group_order, group_structure_1, group_structure_2)
+            datawriter.write_row(data)
 
 
 
@@ -134,14 +136,10 @@ def is_singular(a,b,p,k):
 
 
 if __name__ == '__main__':
-    a_range = (-10,10)
-    b_range = (-10,10)
+    a_range = (17,17)
+    b_range = (0,0)
     p_range = (1,300)
     k_range = (1,15)
 
-    generate_range(a_range, b_range, p_range, k_range, 'data.csv')
+    generate_range(a_range, b_range, p_range, k_range)
  
-
-    
-    
-

@@ -22,6 +22,13 @@ def _group_parse_func(row):
         return f"Z/{G_1}"
     return f"Z/{G_1} + Z/{G_2}"
 
+def _group_string_format(G_1, G_2):
+    if G_1 == 1 and G_2 == 1:
+        return "0"
+    if G_2 == 1:
+        return f"Z/{G_1}"
+    return f"Z/{G_1} + Z/{G_2}"
+
 def convert_to_table(A,B):
     '''
     Tabulates data indexed by (a,b) = (A,B)
@@ -58,15 +65,10 @@ def parse_group_string(s):
     
 #     return data_keys
 
-def get_group_structure(a,b,p,k, data_path=DATA_PATH):
+def get_group(a,b,p,k, data_path=DATA_PATH):
     df = load_data(data_path)
-    group_structure = df.loc[ 
-        (df['a'] == a) &
-        (df['b'] == b) &
-        (df['p'] == p) &
-        (df['k'] == k)
-    ].apply(_group_parse_func, axis=1).values[0]
-    return group_structure
+    return _group_string_format(*df.loc[(a,b,p,k)][['group_struc_1','group_struc_2']])
+    
 
 
 def load_data(data_path=DATA_PATH):
@@ -90,6 +92,7 @@ def load_data(data_path=DATA_PATH):
         df['group_order'] = df['group_order'].apply(int)
         df['group_struc_1'] = df['group_struc_1'].apply(int)
         df['group_struc_2'] = df['group_struc_2'].apply(int)
+        df.set_index(['a','b','p','k'], inplace=True)
 
     return df
 
@@ -114,7 +117,8 @@ if __name__ == '__main__':
     data_file_path = DATA_PATH
     df = load_data()
 
-    print(df)
-
+    print(
+        _group_string_format(*df.loc[(1,0,5,3)][['group_struc_1','group_struc_2']])
+        )
 
 
