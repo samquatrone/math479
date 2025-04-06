@@ -1,5 +1,6 @@
 from sage.all import *
 import csv
+import os
 from itertools import product, islice
 from tqdm import tqdm
 from re import findall
@@ -7,6 +8,60 @@ import pandas as pd
 
 # Import from other files
 import data_processing
+
+class CSVWriter:
+    '''
+    Handles the opening and creation of csv files.
+    
+    '''
+    def __init__(self):
+        self.max_bytes = 90*1024
+        self.generic_file_string = 'data_'
+        self.data_path = os.path.join(os.getcwd(), 'data')
+        self.file_num = len(os.listdir(self.data_path))
+        self.file_path = os.path.join(self.data_path, f'data_{self.file_num}.csv')
+
+        # check last data file for size
+        if os.path.getsize(os.path.join(self.data_path, f'data_{self.file_num}.csv')) >= self.max_bytes:
+            self._open_new_file()
+        else:
+            self._open_file()
+
+
+    def _open_file(self):
+        try:
+            self.csvfile.close()
+        except AttributeError:
+            pass
+
+        self.csvfile = open(self.file_path, 'a', newline='')
+        self.datawriter = csv.writer(self.csvfile, delimiter=',', quotechar="'", quoting=csv.QUOTE_MINIMAL)
+
+
+    def _open_new_file(self):
+        try:
+            self.csvfile.close()
+        except AttributeError:
+            pass
+
+        self.file_num += 1
+        self.file_path = os.path.join(self.data_path, f'data_{self.file_num}.csv')
+        if os.path.exists(self.file_path):
+            raise Exception('file shouldn\'t have existed, but it does.')
+        else:
+            self.csvfile = open(self.file_path, 'w', newline='')
+            self.datawriter = csv.writer(self.csvfile, delimiter=',', quotechar="'", quoting=csv.QUOTE_MINIMAL)
+
+
+    def write_row(self, row):
+        self.datawriter.writerow(row)
+        self.csvfile.flush()
+        if self.csvfile.tell() >= self.max_bytes:
+            self._open_new_file()
+
+
+
+    
 
 
 def generate_range(a_range,b_range,p_range,k_range, data_filename):
@@ -81,12 +136,12 @@ def is_singular(a,b,p,k):
 if __name__ == '__main__':
     a_range = (-10,10)
     b_range = (-10,10)
-    p_range = (1,100)
-    k_range = (1,8)
+    p_range = (1,300)
+    k_range = (1,15)
 
     generate_range(a_range, b_range, p_range, k_range, 'data.csv')
  
 
     
-        
+    
 
