@@ -75,7 +75,7 @@ def load_data(file_path='data.csv'):
             file_path, 
             delimiter=',',
             names=['a','b','p','k','group_order','group_struc_1','group_struc_2'],
-            # dtype={'group_struc_1': int},
+            dtype={'a': int, 'b': int, 'p': int, 'k': int, 'group_order': str, 'group_struc_1': str, 'group_struc_2': str},
             quotechar="'",
             quoting=csv.QUOTE_MINIMAL
         )
